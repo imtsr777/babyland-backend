@@ -1,9 +1,0 @@
-app = "app-nomingiz"
-primary_region = "ams"
-
-[env]
-  PORT = "3000"
-
-[http_service]
-  internal_port = 3000
-  force_https = true
