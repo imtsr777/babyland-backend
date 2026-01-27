@@ -1,7 +1,7 @@
-import { BaseCRUDRepository } from './base';
-import { ArticleEntity } from '../entities';
-import { ArticleModel, ArticleSchema } from '../../database';
-import { PaginationInterface, ArticleRepositoryInterface } from '../../infrastructure';
+import { BaseCRUDRepository } from '../base';
+import { ArticleEntity } from '../../entities';
+import { ArticleModel, ArticleSchema } from '../../../database';
+import { PaginationInterface, ArticleRepositoryInterface } from '../../../infrastructure';
 import { FilterQuery, Types } from 'mongoose';
 
 

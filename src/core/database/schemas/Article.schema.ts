@@ -16,6 +16,10 @@ export class ArticleSchema {
     title: TranslatesSchema;
 
     @prop()
+    description: TranslatesSchema;
+
+
+    @prop()
     image: string;
 
     @prop({ default: ArticleStatusEnum.NOT_FINISHED })

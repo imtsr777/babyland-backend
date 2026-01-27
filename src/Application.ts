@@ -85,7 +85,7 @@ export default class Application {
   }
 
   createFolder() {
-    const imagesDir = path.join(__dirname,'..' ,process.env.IMAGES_FOLDER_NAME);
+    const imagesDir = path.join(__dirname,'..' ,process.env.IMAGES_FOLDER_NAME || 'images');
     if (!fs.existsSync(imagesDir)) {
       fs.mkdirSync(imagesDir, { recursive: true });
       console.log('✅ images folder created');
