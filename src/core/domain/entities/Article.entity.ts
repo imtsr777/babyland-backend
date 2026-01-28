@@ -85,7 +85,7 @@ export class ArticleEntity implements BaseEntityInterface<ArticleEntity, Article
         return schema ? this
             .buildId(schema._id)
             .buildTitle(schema.title)
-            .buildTitle(schema.description)
+            .buildDescription(schema.description)
             .buildImage(schema.image)
             .buildStatus(schema.status)
             .buildCreatedAt(schema.createdAt)

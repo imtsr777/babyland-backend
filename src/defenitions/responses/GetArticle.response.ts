@@ -20,7 +20,7 @@ export class GetArticleResponse {
             this.title = article.getTitle()?.convertToSchema();
             this.description = article.getDescription()?.convertToSchema();
             this.status = article.getStatus();
-            this.imagePath = article?.getImage() ? (process.env.CDN_END_POINT + '/' + process.env.IMAGES_FOLDER_NAME + '/' + article?.getImage()) : null;
+            this.imagePath = article?.getImage() ? (process.env.IMAGES_END_POINT + '/' + process.env.IMAGES_FOLDER_NAME + '/' + article?.getImage()) : null;
             this.createdAt = article.getCreatedAt();
         }
     }

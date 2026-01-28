@@ -1,2 +1,2 @@
 export * from './FileExtensions';
-export * from './UploadImage.util';
+export * from './FileService';

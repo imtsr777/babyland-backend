@@ -16,6 +16,7 @@ export class ArticleRepository
     }
 
     async update(_article: ArticleEntity): Promise<ArticleEntity> {
+        console.log(_article)
         const requiredFields: string[] = ['_id'];
         this.checkRequiredFields(requiredFields, _article);
 

@@ -74,6 +74,7 @@ export default class Application {
       console.log(`Server listening on ${this.protocol}://${this.host}:${this.port}`);
       console.log(`Swagger on ${this.protocol}://${this.host}:${this.port}/doc`);
     });
+    this.server.use('/images', express.static(path.join(__dirname, '..',process.env.IMAGES_FOLDER_NAME || 'images')));
   }
 
   connectMongo() {

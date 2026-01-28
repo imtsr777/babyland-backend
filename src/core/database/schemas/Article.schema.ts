@@ -22,7 +22,7 @@ export class ArticleSchema {
     @prop()
     image: string;
 
-    @prop({ default: ArticleStatusEnum.NOT_FINISHED })
+    @prop({ default: ArticleStatusEnum.INACTIVE })
     status: ArticleStatusEnum;
 
     /** Date of creation */
