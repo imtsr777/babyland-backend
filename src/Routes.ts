@@ -3,7 +3,7 @@ import * as multer from 'multer';
 
 import { CheckClientSessionMiddleware } from './middlewares';
 
-import {CreateArticleController, UpdateArticleController} from './controllers';
+import {CreateArticleController, GetArticleByIdController, UpdateArticleController} from './controllers';
 
 const upload = multer();
 
@@ -27,6 +27,7 @@ routes.prefix('/admin', (operator) => {
 
         article.post('/', upload.single('file'), CreateArticleController);
         article.put('/:id', upload.single('file'), UpdateArticleController);
+        article.get('/:id', upload.single('file'), GetArticleByIdController);
     });
 
 
