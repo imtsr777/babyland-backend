@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="file"], textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 15px;
+            border: none;
+            background: #007BFF;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .response-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e9ffe9;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .response-container img {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+<form id="postForm">
+    <h2>Create Post</h2>
+
+    <label>Title (UZ)</label>
+    <input type="text" name="title_uz" required>
+
+    <label>Title (RU)</label>
+    <input type="text" name="title_ru" required>
+
+    <label>Description (UZ)</label>
+    <textarea name="description_uz" rows="3" required></textarea>
+
+    <label>Description (RU)</label>
+    <textarea name="description_ru" rows="3" required></textarea>
+
+    <label>Image (only images)</label>
+    <input type="file" name="image" accept="image/*" required>
+
+    <button type="submit">Submit</button>
+</form>
+
+<div id="response" class="response-container" style="display:none;"></div>
+
+<script>
+    const form = document.getElementById('postForm');
+    const responseDiv = document.getElementById('response');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('title[uz]', form.title_uz.value);
+        formData.append('title[ru]', form.title_ru.value);
+        formData.append('description[uz]', form.description_uz.value);
+        formData.append('description[ru]', form.description_ru.value);
+
+        const fileInput = form.querySelector('input[name="image"]');
+        if(fileInput.files.length > 0) {
+            formData.append('file', fileInput.files[0]);
+        }
+
+        try {
+            const res = await fetch('http://46.62.251.176:3005/admin/article', { // o'zgartiring o'zingizning API endpoint ga
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await res.json();
+
+            if(data.error) {
+                alert(JSON.stringify(data.error));
+            } else {
+                responseDiv.style.display = 'block';
+                responseDiv.innerHTML = `
+                        <strong>Post Created!</strong><br>
+                        ID: ${data.data.id}<br>
+                        Title (UZ): ${data.data.title.uz}<br>
+                        Title (RU): ${data.data.title.ru}<br>
+                        Description (UZ): ${data.data.description.uz}<br>
+                        Description (RU): ${data.data.description.ru}<br>
+                        DATE: ${data.data.createdAt}<br>
+                        <img src="${data.data.imagePath}" alt="Uploaded Image">
+                    `;
+            }
+        } catch (err) {
+            alert('Request failed: ' + err.message);
+        }
+    });
+</script>
+</body>
+</html>
