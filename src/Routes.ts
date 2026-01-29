@@ -31,9 +31,10 @@ routes.prefix('/admin', (operator) => {
 
     operator.post('/login', LoginController);
 
-    operator.use(CheckClientSessionMiddleware())
 
     operator.prefix('/article', (article) => {
+
+        article.use(CheckClientSessionMiddleware())
 
         article.post('/', upload.single('file'), CreateArticleController);
         article.put('/:id', upload.single('file'), UpdateArticleController);
@@ -43,6 +44,9 @@ routes.prefix('/admin', (operator) => {
     });
 
     operator.prefix('/article-content', (articleContent) => {
+
+        articleContent.use(CheckClientSessionMiddleware())
+
         articleContent.post('/:id', upload.single('file'), CreateArticleContentController);
         articleContent.get('/list', GetArticleContentListController);
         articleContent.get('/:id', GetArticleContentByIdController);
