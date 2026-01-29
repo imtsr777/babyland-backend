@@ -12,6 +12,8 @@ export function sendError(error: any, res: Response, status = 500) {
     console.error('ERROR: ', error);
     switch (error.code) {
         case ErrorCodeEnum.TOKEN_EXPIRED_ERROR:
+        case ErrorCodeEnum.INVALID_TOKEN_ERROR:
+        case ErrorCodeEnum.INCORRECT_PASSWORD_ERROR:
             status = 401;
             break;
         case ErrorCodeEnum.ACCESS_DENIED_ERROR:

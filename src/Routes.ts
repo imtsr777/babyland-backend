@@ -7,7 +7,7 @@ import {
     ChangeArticleStatusController, CreateArticleContentController,
     CreateArticleController, DeleteArticleContentController,
     GetArticleByIdController, GetArticleContentByIdController, GetArticleContentListController,
-    GetArticleListController,
+    GetArticleListController, LoginController,
     UpdateArticleController
 } from './controllers';
 
@@ -29,6 +29,10 @@ const routes = express.Router({mergeParams: true});
 
 routes.prefix('/admin', (operator) => {
 
+    operator.post('/login', LoginController);
+
+    operator.use(CheckClientSessionMiddleware())
+
     operator.prefix('/article', (article) => {
 
         article.post('/', upload.single('file'), CreateArticleController);
@@ -44,6 +48,7 @@ routes.prefix('/admin', (operator) => {
         articleContent.get('/:id', GetArticleContentByIdController);
         articleContent.delete('/:id', DeleteArticleContentController);
     });
+
 
 });
 export default routes;

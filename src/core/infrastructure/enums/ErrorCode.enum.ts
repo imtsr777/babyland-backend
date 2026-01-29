@@ -1,5 +1,8 @@
 export enum ErrorCodeEnum {
     GENERAL_ERROR = 1000,
+    INVALID_TOKEN_ERROR = 1005,
+    TOKEN_EXPIRED_ERROR = 1007,
+    INCORRECT_PASSWORD_ERROR = 1009,
 
 
 
@@ -7,6 +10,5 @@ export enum ErrorCodeEnum {
     REQUIREMENT_ERROR = 2001,
 
 
-    TOKEN_EXPIRED_ERROR = 3000,
     ACCESS_DENIED_ERROR = 3001,
 }
