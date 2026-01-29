@@ -4,8 +4,9 @@ import * as multer from 'multer';
 import { CheckClientSessionMiddleware } from './middlewares';
 
 import {
-    CreateArticleController,
-    GetArticleByIdController,
+    ChangeArticleStatusController, CreateArticleContentController,
+    CreateArticleController, DeleteArticleContentController,
+    GetArticleByIdController, GetArticleContentByIdController, GetArticleContentListController,
     GetArticleListController,
     UpdateArticleController
 } from './controllers';
@@ -34,8 +35,15 @@ routes.prefix('/admin', (operator) => {
         article.put('/:id', upload.single('file'), UpdateArticleController);
         article.get('/list', GetArticleListController);
         article.get('/:id', GetArticleByIdController);
+        article.put('/change-status/:id', ChangeArticleStatusController);
     });
 
+    operator.prefix('/article-content', (articleContent) => {
+        articleContent.post('/:id', upload.single('file'), CreateArticleContentController);
+        articleContent.get('/list', GetArticleContentListController);
+        articleContent.get('/:id', GetArticleContentByIdController);
+        articleContent.delete('/:id', DeleteArticleContentController);
+    });
 
 });
 export default routes;

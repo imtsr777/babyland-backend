@@ -1,6 +1,7 @@
 import { modelOptions, prop, Severity, Ref } from '@typegoose/typegoose';
 import { Types } from 'mongoose';
 import {ArticleContentTypeEnum} from "../../infrastructure";
+import {TranslatesSchema} from "./Translates.schema";
 
 @modelOptions({
     options: {
@@ -18,11 +19,11 @@ export class ArticleContentSchema {
     @prop()
     image: string;
 
-    @prop()
-    paragraph: string;
+    @prop({ _id: false })
+    paragraph: TranslatesSchema;
 
-    @prop()
-    text: string;
+    @prop( { _id: false })
+    text: TranslatesSchema;
 
     @prop()
     type: ArticleContentTypeEnum;

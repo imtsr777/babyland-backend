@@ -5,3 +5,4 @@ export * from './base';
 export * from './BaseCase.interface';
 export * from './BaseList.params';
 export * from './List.interface';
+export * from './ArticleContentRepository.interface';

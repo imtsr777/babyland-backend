@@ -1,15 +1,15 @@
 import { Types } from 'mongoose';
 import { BaseEntityInterface, ArticleContentTypeEnum } from '../../infrastructure';
-import { ArticleContentSchema } from '../../database';
-import { ArticleEntity } from './Article.entity';
+import {ArticleContentSchema, TranslatesSchema} from '../../database';
+import {TranslatesEntity} from "./Translates.entity";
 
 export class ArticleContentEntity implements BaseEntityInterface<ArticleContentEntity, ArticleContentSchema> {
     protected _id?: Types.ObjectId;
     protected _article?: Types.ObjectId;
     protected _order: number;
     protected _image?: string;
-    protected _paragraph?: string;
-    protected _text?: string;
+    protected _paragraph?: TranslatesEntity;
+    protected _text?: TranslatesEntity;
     protected _type: ArticleContentTypeEnum;
     protected _createdAt?: Date;
     protected _updatedAt?: Date;
@@ -36,13 +36,13 @@ export class ArticleContentEntity implements BaseEntityInterface<ArticleContentE
         return this;
     }
 
-    buildParagraph(paragraph: string): ArticleContentEntity {
-        this._paragraph = paragraph;
+    buildParagraph(arg: TranslatesSchema): ArticleContentEntity {
+        this._paragraph = new TranslatesEntity().convertToEntity(arg);
         return this;
     }
 
-    buildText(text: string): ArticleContentEntity {
-        this._text = text;
+    buildText(text: TranslatesSchema): ArticleContentEntity {
+        this._text = new TranslatesEntity().convertToEntity(text);
         return this;
     }
 
@@ -79,11 +79,11 @@ export class ArticleContentEntity implements BaseEntityInterface<ArticleContentE
         return this._image;
     }
 
-    getParagraph(): string {
+    getParagraph(): TranslatesEntity {
         return this._paragraph;
     }
 
-    getText(): string {
+    getText(): TranslatesEntity {
         return this._text;
     }
 
@@ -124,8 +124,8 @@ export class ArticleContentEntity implements BaseEntityInterface<ArticleContentE
             article: this.getArticle(),
             order: this.getOrder(),
             image: this.getImage(),
-            paragraph: this.getParagraph(),
-            text: this.getText(),
+            paragraph: this.getParagraph() ? this.getParagraph().convertToSchema() : null,
+            text: this.getText() ? this.getText().convertToSchema() : null,
             type: this.getType(),
             createdAt: this.getCreatedAt(),
             updatedAt: this.getUpdatedAt(),
