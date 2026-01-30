@@ -25,7 +25,7 @@ export async function GetArticleContentListController(req: express.Request, res:
         return sendValidationError(err, res);
     }
     try {
-        const filterQuery: FilterQuery<any> = { articleId: new Types.ObjectId(params.articleId)};
+        const filterQuery: FilterQuery<any> = { article: new Types.ObjectId(params.articleId)};
 
         const getArticleContentListParams = {
             pagination: {
