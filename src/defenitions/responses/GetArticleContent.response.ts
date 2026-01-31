@@ -1,4 +1,4 @@
-import {ArticleContentEntity, TranslatesSchema} from "../../core";
+import {ArticleContentEntity, ArticleContentTypeEnum, TranslatesSchema} from "../../core";
 
 export class GetArticleContentResponse {
     id?: string;
@@ -11,6 +11,8 @@ export class GetArticleContentResponse {
 
     order: number;
 
+    type: ArticleContentTypeEnum;
+
     constructor(articleContent: ArticleContentEntity) {
 
         if (articleContent && articleContent instanceof ArticleContentEntity) {
@@ -19,6 +21,7 @@ export class GetArticleContentResponse {
             this.text = articleContent.getText()?.convertToSchema();
             this.imagePath = articleContent?.getImage() ? (process.env.IMAGES_END_POINT + '/' + process.env.IMAGES_FOLDER_NAME + '/' + articleContent?.getImage()) : null;
             this.order = articleContent.getOrder() ?? 0;
+            this.type = articleContent.getType();
         }
     }
 }

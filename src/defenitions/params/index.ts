@@ -6,3 +6,4 @@ export * from './ChangeArticleStatus.params';
 export * from './CreateArticleContent.params';
 export * from './GetArticleContentList.params';
 export * from './Login.params';
+export * from './article-for-user';

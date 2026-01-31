@@ -3,21 +3,22 @@ import FileExtensions from "./FileExtensions";
 import * as fs from "fs";
 import { v4 } from 'uuid';
 import { promisify } from 'util';
+import {RequirementError} from "../core";
 
 
 export class FileService {
    static async uploadImage(file: any ): Promise<string> {
         if( !file ) {
-            throw new Error('File majburiy maydon');
+            throw new RequirementError('Rasm');
         }
         const ext = path.extname(file.originalname);
 
         if( !FileExtensions.imageExtensions.includes(ext) ) {
-            throw new Error('Rasm yuklashingiz kerak');
+            throw new RequirementError('', 'Faqat rasmlar ruxsat berilgan');
         }
 
         if( file.size > 20 * 1024 * 1024  ) {
-            throw new Error('Rasm hajmi juda katta');
+            throw new RequirementError('', 'Rasm hajmi juda katta');
         }
 
         const newFileName = v4()+ ext;

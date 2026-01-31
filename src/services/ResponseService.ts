@@ -11,13 +11,20 @@ export function sendSuccess(data: any, res: Response, status = 200) {
 export function sendError(error: any, res: Response, status = 500) {
     console.error('ERROR: ', error);
     switch (error.code) {
+        case ErrorCodeEnum.REQUIREMENT_ERROR:
+            status = 400;
+            break;
         case ErrorCodeEnum.TOKEN_EXPIRED_ERROR:
         case ErrorCodeEnum.INVALID_TOKEN_ERROR:
         case ErrorCodeEnum.INCORRECT_PASSWORD_ERROR:
+        case ErrorCodeEnum.TOKEN_NOT_PROVIDED_ERROR:
             status = 401;
             break;
         case ErrorCodeEnum.ACCESS_DENIED_ERROR:
             status = 403;
+            break;
+        case ErrorCodeEnum.NOT_FOUND_ERROR:
+            status = 404;
             break;
         default:
             status = 500;

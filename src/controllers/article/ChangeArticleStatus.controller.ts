@@ -1,7 +1,7 @@
 import * as express from 'express';
 import {ChangeArticleStatusParams, GetArticleResponse, IdParams} from '../../defenitions';
 import {sendError, sendSuccess, sendValidationError} from '../../services';
-import {ArticleStatusEnum, Repository} from '../../core';
+import {ArticleStatusEnum, NotFoundError, Repository} from '../../core';
 import {Types} from "mongoose";
 
 export async function ChangeArticleStatusController(req: express.Request, res: express.Response) {
@@ -20,7 +20,7 @@ export async function ChangeArticleStatusController(req: express.Request, res: e
 
         const article = await Repository.Article().getById(new Types.ObjectId(idParams.id));
         if( !article || article?.getStatus() === ArticleStatusEnum.DELETED){
-            throw new Error("Article not found");
+            throw new NotFoundError('Article');
         }
 
         article.buildStatus(params.status);

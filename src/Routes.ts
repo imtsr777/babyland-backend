@@ -4,55 +4,60 @@ import * as multer from 'multer';
 import { CheckClientSessionMiddleware } from './middlewares';
 
 import {
-    ChangeArticleStatusController, CreateArticleContentController,
-    CreateArticleController, DeleteArticleContentController,
-    GetArticleByIdController, GetArticleContentByIdController, GetArticleContentListController,
-    GetArticleListController, LoginController,
-    UpdateArticleController
+  ChangeArticleStatusController,
+  CreateArticleContentController,
+  CreateArticleController,
+  DeleteArticleContentController,
+  GetArticleByIdController,
+  GetArticleContentByIdController,
+  GetArticleContentListController,
+  GetArticleForUserBySlugController,
+  GetArticleForUserListController,
+  GetArticleListController,
+  LoginController,
+  UpdateArticleController,
 } from './controllers';
 
 const upload = multer();
 
-
 function nestedRoutes(path, configure) {
-    const router = express.Router({mergeParams: true});
-    this.use(path, router);
-    configure(router);
-    return router;
+  const router = express.Router({ mergeParams: true });
+  this.use(path, router);
+  configure(router);
+  return router;
 }
-
 
 express.application['prefix'] = nestedRoutes;
 express.Router['prefix'] = nestedRoutes;
 
-const routes = express.Router({mergeParams: true});
+const routes = express.Router({ mergeParams: true });
 
 routes.prefix('/admin', (operator) => {
+  operator.post('/login', LoginController);
 
-    operator.post('/login', LoginController);
+  operator.prefix('/article', (article) => {
+    article.use(CheckClientSessionMiddleware());
 
+    article.post('/', upload.single('file'), CreateArticleController);
+    article.put('/:id', upload.single('file'), UpdateArticleController);
+    article.get('/list', GetArticleListController);
+    article.get('/:id', GetArticleByIdController);
+    article.put('/change-status/:id', ChangeArticleStatusController);
+  });
 
-    operator.prefix('/article', (article) => {
+  operator.prefix('/article-content', (articleContent) => {
+    articleContent.use(CheckClientSessionMiddleware());
 
-        article.use(CheckClientSessionMiddleware())
-
-        article.post('/', upload.single('file'), CreateArticleController);
-        article.put('/:id', upload.single('file'), UpdateArticleController);
-        article.get('/list', GetArticleListController);
-        article.get('/:id', GetArticleByIdController);
-        article.put('/change-status/:id', ChangeArticleStatusController);
-    });
-
-    operator.prefix('/article-content', (articleContent) => {
-
-        articleContent.use(CheckClientSessionMiddleware())
-
-        articleContent.post('/:id', upload.single('file'), CreateArticleContentController);
-        articleContent.get('/list', GetArticleContentListController);
-        articleContent.get('/:id', GetArticleContentByIdController);
-        articleContent.delete('/:id', DeleteArticleContentController);
-    });
-
-
+    articleContent.post('/:id', upload.single('file'), CreateArticleContentController);
+    articleContent.get('/list', GetArticleContentListController);
+    articleContent.get('/:id', GetArticleContentByIdController);
+    articleContent.delete('/:id', DeleteArticleContentController);
+  });
 });
+
+routes.prefix('/:lang', (obj) => {
+  obj.get('/articles', GetArticleForUserListController);
+  obj.get('/article/:slug', GetArticleForUserBySlugController);
+});
+
 export default routes;

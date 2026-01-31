@@ -4,7 +4,7 @@ import {sendError, sendSuccess, sendValidationError} from '../../services';
 import {
     ArticleContentEntity,
     ArticleContentTypeEnum,
-    ArticleStatusEnum,
+    ArticleStatusEnum, NotFoundError,
     Repository,
     RequirementError
 } from '../../core';
@@ -25,7 +25,7 @@ export async function CreateArticleContentController(req: express.Request, res: 
     try {
         const article = await Repository.Article().getById(new Types.ObjectId(idParams.id));
         if( !article || article.getStatus() === ArticleStatusEnum.DELETED ){
-            throw new Error("Article not found");
+            throw new NotFoundError('Article');
         }
         const articleContentEntity = new ArticleContentEntity().buildType(params.type).buildArticle(article.getId()).buildOrder(params.order);
         switch (params.type){

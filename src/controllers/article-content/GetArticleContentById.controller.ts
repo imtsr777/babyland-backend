@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { GetArticleContentResponse, IdParams} from '../../defenitions';
 import {sendError, sendSuccess, sendValidationError} from '../../services';
-import {Repository} from '../../core';
+import {NotFoundError, Repository} from '../../core';
 import {Types} from "mongoose";
 
 export async function GetArticleContentByIdController(req: express.Request, res: express.Response) {
@@ -18,7 +18,7 @@ export async function GetArticleContentByIdController(req: express.Request, res:
 
         const articleContent = await Repository.ArticleContent().getById(new Types.ObjectId(idParams.id));
         if( !articleContent ){
-            throw new Error("Article content not found");
+            throw new NotFoundError('Article content');
         }
 
         response = new GetArticleContentResponse(articleContent);
