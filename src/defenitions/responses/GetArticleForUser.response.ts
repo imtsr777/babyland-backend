@@ -22,7 +22,7 @@ export class GetArticleForUserResponse {
     if (article && article instanceof ArticleEntity) {
       this.id = article.getId()?.toString();
       this.title = article.getTitle()?.getByLang(language);
-      this.description = article.getTitle()?.getByLang(language);
+      this.description = article.getDescription()?.getByLang(language);
       this.imagePath = article?.getImage() ? process.env.IMAGES_END_POINT + '/' + process.env.IMAGES_FOLDER_NAME + '/' + article?.getImage() : null;
       this.createdAt = article.getCreatedAt();
       this.slug = article?.getSlug()?.getByLang(language);
