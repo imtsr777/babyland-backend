@@ -14,6 +14,6 @@ RUN --mount=type=ssh yarn install
 RUN yarn build
 
 CMD yarn start
-EXPOSE 3005
+EXPOSE 8008
 
 #docker build . -t secure-app-secrets:1.0 --secret id=npmrc,src=$HOME/.npmrc
