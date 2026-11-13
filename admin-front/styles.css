@@ -147,3 +147,20 @@ td.actions .btn { margin-left: 4px; }
 }
 .toast.error { background: var(--danger); }
 .toast.success { background: var(--success); }
+
+/* ---------- HTML content blocks ---------- */
+textarea.code-input, .code-preview {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+.code-preview {
+  margin: 4px 0 8px;
+  padding: 8px 10px;
+  max-height: 180px;
+  overflow: auto;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

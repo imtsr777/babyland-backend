@@ -10,6 +10,7 @@ export class ArticleContentEntity implements BaseEntityInterface<ArticleContentE
     protected _image?: string;
     protected _paragraph?: TranslatesEntity;
     protected _text?: TranslatesEntity;
+    protected _html?: TranslatesEntity;
     protected _type: ArticleContentTypeEnum;
     protected _createdAt?: Date;
     protected _updatedAt?: Date;
@@ -43,6 +44,11 @@ export class ArticleContentEntity implements BaseEntityInterface<ArticleContentE
 
     buildText(text: TranslatesSchema): ArticleContentEntity {
         this._text = new TranslatesEntity().convertToEntity(text);
+        return this;
+    }
+
+    buildHtml(html: TranslatesSchema): ArticleContentEntity {
+        this._html = new TranslatesEntity().convertToEntity(html);
         return this;
     }
 
@@ -87,6 +93,10 @@ export class ArticleContentEntity implements BaseEntityInterface<ArticleContentE
         return this._text;
     }
 
+    getHtml(): TranslatesEntity {
+        return this._html;
+    }
+
     getType(): ArticleContentTypeEnum {
         return this._type;
     }
@@ -111,6 +121,7 @@ export class ArticleContentEntity implements BaseEntityInterface<ArticleContentE
             .buildImage(schema.image)
             .buildParagraph(schema.paragraph)
             .buildText(schema.text)
+            .buildHtml(schema.html)
             .buildType(schema.type)
             .buildCreatedAt(schema.createdAt)
             .buildUpdatedAt(schema.updatedAt);
@@ -126,6 +137,7 @@ export class ArticleContentEntity implements BaseEntityInterface<ArticleContentE
             image: this.getImage(),
             paragraph: this.getParagraph() ? this.getParagraph().convertToSchema() : null,
             text: this.getText() ? this.getText().convertToSchema() : null,
+            html: this.getHtml() ? this.getHtml().convertToSchema() : null,
             type: this.getType(),
             createdAt: this.getCreatedAt(),
             updatedAt: this.getUpdatedAt(),

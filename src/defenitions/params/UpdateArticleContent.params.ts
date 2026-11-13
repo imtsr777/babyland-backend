@@ -6,12 +6,15 @@ export class UpdateArticleContentParams {
 
     text: TranslatesSchema;
 
+    html: TranslatesSchema;
+
     order: number;
 
     constructor(params: any) {
         if (params) {
             this.paragraph = params?.paragraph;
             this.text = params?.text;
+            this.html = params?.html;
             this.order = params?.order;
         }
     }
@@ -29,6 +32,10 @@ export const UpdateArticleContentParamsSchema = Joi.object<UpdateArticleContentP
     text: Joi.object({
         uz: Joi.string().trim().required().max(50000),
         ru: Joi.string().trim().required().max(50000),
+    }),
+    html: Joi.object({
+        uz: Joi.string().trim().required().max(500000),
+        ru: Joi.string().trim().required().max(500000),
     }),
     order: Joi.number().min(0).max(1000).required(),
 });

@@ -43,6 +43,13 @@ export async function CreateArticleContentController(req: express.Request, res: 
                 articleContentEntity.buildParagraph(params.paragraph);
                 break;
             }
+            case ArticleContentTypeEnum.HTML: {
+                if( !params.html ){
+                    throw new RequirementError('HTML')
+                }
+                articleContentEntity.buildHtml(params.html);
+                break;
+            }
             case ArticleContentTypeEnum.IMAGE: {
                 const uploadedImage = await FileService.uploadImage(req.file);
                 articleContentEntity.buildImage(uploadedImage);

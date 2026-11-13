@@ -7,6 +7,8 @@ export class GetArticleContentResponse {
 
     text?: TranslatesSchema;
 
+    html?: TranslatesSchema;
+
     imagePath?: string;
 
     order: number;
@@ -19,6 +21,7 @@ export class GetArticleContentResponse {
             this.id = articleContent.getId()?.toString();
             this.paragraph = articleContent.getParagraph()?.convertToSchema();
             this.text = articleContent.getText()?.convertToSchema();
+            this.html = articleContent.getHtml()?.convertToSchema();
             this.imagePath = articleContent?.getImage() ? (process.env.IMAGES_END_POINT + '/' + process.env.IMAGES_FOLDER_NAME + '/' + articleContent?.getImage()) : null;
             this.order = articleContent.getOrder() ?? 0;
             this.type = articleContent.getType();

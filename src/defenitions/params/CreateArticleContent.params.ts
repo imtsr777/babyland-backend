@@ -7,6 +7,8 @@ export class CreateArticleContentParams {
 
     text: TranslatesSchema;
 
+    html: TranslatesSchema;
+
     type: ArticleContentTypeEnum;
 
     order: number;
@@ -15,6 +17,7 @@ export class CreateArticleContentParams {
         if (params) {
             this.paragraph = params?.paragraph;
             this.text = params?.text;
+            this.html = params?.html;
             this.type = params?.type;
             this.order = params?.order;
         }
@@ -33,6 +36,10 @@ export const CreateArticleContentParamsSchema = Joi.object<CreateArticleContentP
     text: Joi.object({
         uz: Joi.string().trim().required().max(50000),
         ru: Joi.string().trim().required().max(50000),
+    }),
+    html: Joi.object({
+        uz: Joi.string().trim().required().max(500000),
+        ru: Joi.string().trim().required().max(500000),
     }),
     type: Joi.valid(...Object.values(ArticleContentTypeEnum)).required(),
     order: Joi.number().required().min(0).max(1000).required(),

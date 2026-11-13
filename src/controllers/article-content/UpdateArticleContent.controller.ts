@@ -41,6 +41,13 @@ export async function UpdateArticleContentController(req: express.Request, res: 
                 articleContent.buildParagraph(params.paragraph);
                 break;
             }
+            case ArticleContentTypeEnum.HTML: {
+                if (!params.html) {
+                    throw new RequirementError('HTML');
+                }
+                articleContent.buildHtml(params.html);
+                break;
+            }
             case ArticleContentTypeEnum.IMAGE: {
                 // New image is optional; keep the old one if no file was sent
                 if (req.file) {

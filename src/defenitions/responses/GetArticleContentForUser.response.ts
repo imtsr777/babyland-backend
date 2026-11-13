@@ -5,6 +5,8 @@ export class GetArticleContentForUserResponse {
 
   text?: string;
 
+  html?: string;
+
   imagePath?: string;
 
   order: number;
@@ -15,6 +17,7 @@ export class GetArticleContentForUserResponse {
     if (articleContent && articleContent instanceof ArticleContentEntity) {
       this.paragraph = articleContent.getParagraph()?.getByLang(language);
       this.text = articleContent.getText()?.getByLang(language);
+      this.html = articleContent.getHtml()?.getByLang(language);
       this.type = articleContent?.getType();
       this.imagePath = articleContent?.getImage()
         ? process.env.IMAGES_END_POINT + '/' + process.env.IMAGES_FOLDER_NAME + '/' + articleContent?.getImage()

@@ -25,6 +25,9 @@ export class ArticleContentSchema {
     @prop( { _id: false })
     text: TranslatesSchema;
 
+    @prop({ _id: false })
+    html: TranslatesSchema;
+
     @prop()
     type: ArticleContentTypeEnum;
 

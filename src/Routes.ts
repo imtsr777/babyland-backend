@@ -19,7 +19,8 @@ import {
   UpdateArticleController,
 } from './controllers';
 
-const upload = multer();
+// fieldSize: allow long HTML content blocks (multer default is 1MB per text field)
+const upload = multer({ limits: { fieldSize: 5 * 1024 * 1024 } });
 
 function nestedRoutes(path, configure) {
   const router = express.Router({ mergeParams: true });
