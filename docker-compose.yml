@@ -1,7 +1,44 @@
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
   app:
     build: .
+    image: babyland-backend
     env_file:
       - .env
-    network_mode: host
+    environment:
+      MONGO_URL: mongodb://${MONGO_USER:?set MONGO_USER in .env}:${MONGO_PASSWORD:?set MONGO_PASSWORD in .env}@mongo:27017/babyland?authSource=admin
+    ports:
+      - "${APP_BIND:-0.0.0.0}:8008:8008"
+    volumes:
+      - images:/app/images
+    depends_on:
+      mongo:
+        condition: service_healthy
     restart: unless-stopped
+    logging: *default-logging
+
+  mongo:
+    image: mongo:7
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongo-data:/data/db
+    # No host port: Mongo is reachable only from the app container.
+    # Admin access: docker compose exec mongo mongosh -u "$MONGO_USER" -p
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    logging: *default-logging
+
+volumes:
+  mongo-data:
+  images:

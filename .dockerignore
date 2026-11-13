@@ -1,0 +1,12 @@
+node_modules
+dist
+images
+.env
+.env.*
+!.env.example
+.git
+.idea
+*.log
+Dockerfile
+docker-compose.yml
+.dockerignore

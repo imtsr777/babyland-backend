@@ -81,7 +81,7 @@ export default class Application {
     this.mongo = new Mongo().buildUri(this.mongoUrl).buildOptions({ autoIndex: false });
 
     this.mongo.connect().then(() => {
-      console.log(`Mongo connect: ${this.mongoUrl}`);
+      console.log(`Mongo connect: ${this.mongoUrl.replace(/\/\/[^@/]*@/, '//***@')}`);
     });
   }
 
