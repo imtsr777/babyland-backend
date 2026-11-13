@@ -17,6 +17,7 @@ COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --production && yarn cache clean
 
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/admin-front ./admin-front
 
 # Uploaded images live here (mounted as a volume); must be writable by the non-root user
 RUN mkdir -p /app/images && chown -R node:node /app/images

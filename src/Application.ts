@@ -68,6 +68,8 @@ export default class Application {
       }),
     );
     this.server.use(ModernMiddleware);
+    // Admin panel UI (static SPA in /admin-front) — uses the /admin/* API on the same origin
+    this.server.use('/admin-front', express.static(path.join(__dirname, '..', 'admin-front')));
     this.server.use(routes);
     this.http = createServer(this.server);
     this.http.listen(this.port).on('listening', () => {
