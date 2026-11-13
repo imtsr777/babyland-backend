@@ -15,6 +15,7 @@ import {
   GetArticleForUserListController,
   GetArticleListController,
   LoginController,
+  UpdateArticleContentController,
   UpdateArticleController,
 } from './controllers';
 
@@ -50,6 +51,7 @@ routes.prefix('/admin', (operator) => {
 
     articleContent.post('/:id', upload.single('file'), CreateArticleContentController);
     articleContent.get('/list', GetArticleContentListController);
+    articleContent.put('/:id', upload.single('file'), UpdateArticleContentController);
     articleContent.get('/:id', GetArticleContentByIdController);
     articleContent.delete('/:id', DeleteArticleContentController);
   });

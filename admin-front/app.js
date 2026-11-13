@@ -446,7 +446,10 @@
             ${b.type === 'TEXT' ? translatesHtml(b.text) : ''}
             ${b.type === 'PARAGRAPH' ? translatesHtml(b.paragraph) : ''}
           </div>
-          <div><button class="btn btn-sm btn-danger" data-delete="${esc(b.id)}">O'chirish</button></div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button class="btn btn-sm" data-edit="${esc(b.id)}">Tahrirlash</button>
+            <button class="btn btn-sm btn-danger" data-delete="${esc(b.id)}">O'chirish</button>
+          </div>
         </div>`,
       )
       .join('');
@@ -533,6 +536,13 @@
       };
     });
 
+    app.querySelectorAll('button[data-edit]').forEach((btn) => {
+      btn.onclick = () => {
+        const block = blocks.find((b) => b.id === btn.dataset.edit);
+        if (block) openBlockEditor(btn.closest('.content-block'), block);
+      };
+    });
+
     const form = document.getElementById('content-form');
     if (!form) return;
     const fields = document.getElementById('content-fields');
@@ -572,6 +582,74 @@
       try {
         await api('POST', '/article-content/' + id, { form: fd });
         toast("Blok qo'shildi", 'success');
+        render();
+      } catch (err) {
+        toast(err.message, 'error');
+        btn.disabled = false;
+      }
+    };
+  }
+
+  /** Replace a content block card with an inline edit form (PUT /article-content/:id). */
+  function openBlockEditor(container, block) {
+    const isImage = block.type === 'IMAGE';
+    const value = block.type === 'TEXT' ? block.text : block.paragraph;
+
+    container.outerHTML = `
+      <form class="content-block" id="edit-block-form" style="flex-direction:column;gap:0;border-color:var(--primary)">
+        <div><span class="badge badge-type">${esc(block.type)}</span></div>
+        <div class="grid-2">
+          <div>
+            <label>Tartib raqami (order)</label>
+            <input name="order" type="number" min="0" max="1000" required value="${esc(block.order)}" />
+          </div>
+        </div>
+        ${
+          isImage
+            ? `<label>Rasm <span class="hint">(o'zgartirish uchun yangisini tanlang)</span></label>
+               <input name="file" type="file" accept="${IMAGE_ACCEPT}" />
+               <img id="edit-preview" class="image-preview" ${block.imagePath ? `src="${esc(block.imagePath)}"` : 'hidden'} alt="" />`
+            : `<div class="grid-2">
+                 <div><label>UZ</label><textarea name="val_uz" required rows="6">${esc(value && value.uz)}</textarea></div>
+                 <div><label>RU</label><textarea name="val_ru" required rows="6">${esc(value && value.ru)}</textarea></div>
+               </div>`
+        }
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Saqlash</button>
+          <button class="btn" type="button" id="edit-cancel">Bekor qilish</button>
+        </div>
+      </form>`;
+
+    const form = document.getElementById('edit-block-form');
+    form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('edit-cancel').onclick = () => render();
+
+    if (isImage) {
+      const preview = document.getElementById('edit-preview');
+      form.file.onchange = () => {
+        const f = form.file.files[0];
+        if (f) {
+          preview.src = URL.createObjectURL(f);
+          preview.hidden = false;
+        }
+      };
+    }
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const fd = new FormData();
+      fd.append('order', form.order.value);
+      if (isImage) {
+        if (form.file.files[0]) fd.append('file', form.file.files[0]);
+      } else {
+        appendTranslates(fd, block.type === 'TEXT' ? 'text' : 'paragraph', form.val_uz.value.trim(), form.val_ru.value.trim());
+      }
+
+      const btn = form.querySelector('button[type=submit]');
+      btn.disabled = true;
+      try {
+        await api('PUT', '/article-content/' + block.id, { form: fd });
+        toast('Blok saqlandi', 'success');
         render();
       } catch (err) {
         toast(err.message, 'error');
