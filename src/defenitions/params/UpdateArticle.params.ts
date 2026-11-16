@@ -7,10 +7,13 @@ export class UpdateArticleParams {
 
     description: TranslatesSchema;
 
+    slug?: TranslatesSchema;
+
     constructor(params: any) {
         if (params) {
             this.title = params?.title;
             this.description = params?.description;
+            this.slug = params?.slug;
         }
     }
 
@@ -28,4 +31,8 @@ export const UpdateArticleParamsSchema = Joi.object<UpdateArticleParams>({
         uz: Joi.string().trim().required().max(50000),
         ru: Joi.string().trim().required().max(50000),
     }).required(),
+    slug: Joi.object({
+        uz: Joi.string().trim().required().min(5).max(70),
+        ru: Joi.string().trim().required().min(5).max(70),
+    }),
 });

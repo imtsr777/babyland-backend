@@ -8,4 +8,6 @@ export interface ArticleRepositoryInterface extends BaseCRUDRepositoryInterface<
     countDocumentsByFilter(filter: FilterQuery<ArticleSchema>): Promise<number>;
     delete(_id: Types.ObjectId): Promise<void>;
     getBySlug(slug: string, language: LanguageEnum ): Promise<ArticleEntity>;
+    getByOldSlug(slug: string): Promise<ArticleEntity>;
+    isSlugTaken(slug: string, excludeId?: Types.ObjectId): Promise<boolean>;
 }

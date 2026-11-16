@@ -5,7 +5,12 @@ import { ArticleContentTypeEnum, NotFoundError, Repository, RequirementError } f
 import { Types } from 'mongoose';
 import { FileService } from '../../utils';
 
-/** Updates a content block. The block type cannot change; only order and the type's own value (text / paragraph / image). */
+/**
+ * Updates a content block: order, value and (optionally) type.
+ * When the type changes, the values of the old type are cleared:
+ *  - text-like -> IMAGE: a new image file is required;
+ *  - IMAGE -> text-like: the old image file is deleted after a successful save.
+ */
 export async function UpdateArticleContentController(req: express.Request, res: express.Response) {
     let params: UpdateArticleContentParams;
     let idParams: IdParams;
@@ -24,9 +29,23 @@ export async function UpdateArticleContentController(req: express.Request, res: 
             throw new NotFoundError('Article content');
         }
 
-        articleContent.buildOrder(params.order);
+        const oldType = articleContent.getType();
+        const newType = params.type ?? oldType;
+        const oldImage = articleContent.getImage();
+        let imageToDelete: string = null;
 
-        switch (articleContent.getType()) {
+        articleContent.buildOrder(params.order).buildType(newType);
+
+        if (newType !== ArticleContentTypeEnum.IMAGE) {
+            // Text-like types: only the new type's field keeps a value
+            articleContent.buildText(null).buildParagraph(null).buildHtml(null);
+            if (oldImage) {
+                articleContent.buildImage(null);
+                imageToDelete = oldImage;
+            }
+        }
+
+        switch (newType) {
             case ArticleContentTypeEnum.TEXT: {
                 if (!params.text) {
                     throw new RequirementError('Text');
@@ -49,20 +68,27 @@ export async function UpdateArticleContentController(req: express.Request, res: 
                 break;
             }
             case ArticleContentTypeEnum.IMAGE: {
-                // New image is optional; keep the old one if no file was sent
+                // Becoming an image (or an image without a file) requires an upload; otherwise it's optional
+                if (!req.file && (oldType !== ArticleContentTypeEnum.IMAGE || !oldImage)) {
+                    throw new RequirementError('Image');
+                }
                 if (req.file) {
-                    const oldImage = articleContent.getImage();
                     const uploadedImage = await FileService.uploadImage(req.file);
                     articleContent.buildImage(uploadedImage);
-                    if (oldImage) {
-                        await FileService.deleteImage(oldImage);
-                    }
+                    imageToDelete = oldImage || null;
                 }
+                articleContent.buildText(null).buildParagraph(null).buildHtml(null);
                 break;
             }
         }
 
         const updatedArticleContent = await Repository.ArticleContent().update(articleContent);
+
+        // Delete the old file only after the DB update succeeded
+        if (imageToDelete) {
+            await FileService.deleteImage(imageToDelete);
+        }
+
         response = new GetArticleContentResponse(updatedArticleContent);
         return sendSuccess(response, res);
     } catch (error) {

@@ -23,7 +23,13 @@ export async function CreateArticleController(req: express.Request, res: express
 
     const slug = new TranslatesEntity().buildUz(textFormatter.generateSlug(slugTextUz)).buildRu(textFormatter.generateSlug(slugTextRu));
 
-    const similarArticles = await ArticleModel.find({ $or: [{ 'slug.uz': slug.getUz() }, { 'slug.ru': slug.getRu() }] });
+    const similarArticles = await ArticleModel.find({
+      $or: [
+        { 'slug.uz': { $in: [slug.getUz(), slug.getRu()] } },
+        { 'slug.ru': { $in: [slug.getUz(), slug.getRu()] } },
+        { oldSlugs: { $in: [slug.getUz(), slug.getRu()] } },
+      ],
+    });
 
     if (similarArticles.length > 0) {
       const today = new Date().toISOString().slice(0, 10);

@@ -8,6 +8,7 @@ export class ArticleEntity implements BaseEntityInterface<ArticleEntity, Article
     protected _title: TranslatesEntity;
     protected _description: TranslatesEntity;
     protected _slug: TranslatesEntity;
+    protected _oldSlugs: string[];
     protected _image: string;
     protected _status: ArticleStatusEnum;
     protected _createdAt?: Date;
@@ -32,6 +33,11 @@ export class ArticleEntity implements BaseEntityInterface<ArticleEntity, Article
 
     buildSlug(arg: TranslatesSchema): ArticleEntity {
         this._slug = new TranslatesEntity().convertToEntity(arg);
+        return this;
+    }
+
+    buildOldSlugs(arg: string[]): ArticleEntity {
+        this._oldSlugs = arg ? [...arg] : [];
         return this;
     }
 
@@ -73,6 +79,10 @@ export class ArticleEntity implements BaseEntityInterface<ArticleEntity, Article
         return this._slug;
     }
 
+    getOldSlugs(): string[] {
+        return this._oldSlugs || [];
+    }
+
     getImage(): string {
         return this._image;
     }
@@ -97,6 +107,7 @@ export class ArticleEntity implements BaseEntityInterface<ArticleEntity, Article
             .buildTitle(schema.title)
             .buildDescription(schema.description)
             .buildSlug(schema.slug)
+            .buildOldSlugs(schema.oldSlugs)
             .buildImage(schema.image)
             .buildStatus(schema.status)
             .buildCreatedAt(schema.createdAt)
@@ -111,6 +122,7 @@ export class ArticleEntity implements BaseEntityInterface<ArticleEntity, Article
             title: this.getTitle() ? this.getTitle().convertToSchema() : null,
             description: this.getDescription() ? this.getDescription()?.convertToSchema() : null,
             slug: this.getSlug() ? this.getSlug()?.convertToSchema() : null,
+            oldSlugs: this.getOldSlugs(),
             image: this.getImage(),
             status: this.getStatus(),
             createdAt: this.getCreatedAt(),

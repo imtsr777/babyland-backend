@@ -12,7 +12,6 @@ export class ArticleRepository extends BaseCRUDRepository<ArticleEntity, Article
   }
 
   async update(_article: ArticleEntity): Promise<ArticleEntity> {
-    console.log(_article);
     const requiredFields: string[] = ['_id'];
     this.checkRequiredFields(requiredFields, _article);
 
@@ -51,6 +50,22 @@ export class ArticleRepository extends BaseCRUDRepository<ArticleEntity, Article
 
     const found = await ArticleModel.findOne(filter);
     return new ArticleEntity().convertToEntity(found);
+  }
+
+  async getByOldSlug(slug: string): Promise<ArticleEntity> {
+    const found = await ArticleModel.findOne({ oldSlugs: slug });
+    return new ArticleEntity().convertToEntity(found);
+  }
+
+  /** Slug boshqa maqolada (joriy yoki eski slug sifatida) band qilinganmi */
+  async isSlugTaken(slug: string, excludeId?: Types.ObjectId): Promise<boolean> {
+    const filter: FilterQuery<ArticleSchema> = {
+      $or: [{ 'slug.uz': slug }, { 'slug.ru': slug }, { oldSlugs: slug }],
+    };
+    if (excludeId) {
+      filter._id = { $ne: excludeId };
+    }
+    return (await ArticleModel.countDocuments(filter)) > 0;
   }
 
   async delete(_id: Types.ObjectId): Promise<void> {

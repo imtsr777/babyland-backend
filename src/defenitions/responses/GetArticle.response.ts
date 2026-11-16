@@ -7,6 +7,8 @@ export class GetArticleResponse {
 
     description?: TranslatesSchema;
 
+    slug?: TranslatesSchema;
+
     status?: ArticleStatusEnum;
 
     imagePath?: string;
@@ -19,6 +21,7 @@ export class GetArticleResponse {
             this.id = article.getId()?.toString();
             this.title = article.getTitle()?.convertToSchema();
             this.description = article.getDescription()?.convertToSchema();
+            this.slug = article.getSlug()?.convertToSchema();
             this.status = article.getStatus();
             this.imagePath = article?.getImage() ? (process.env.IMAGES_END_POINT + '/' + process.env.IMAGES_FOLDER_NAME + '/' + article?.getImage()) : null;
             this.createdAt = article.getCreatedAt();

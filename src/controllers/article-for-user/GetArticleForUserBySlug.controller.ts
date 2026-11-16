@@ -17,6 +17,10 @@ export async function GetArticleForUserBySlugController(req: express.Request, re
       article = await Repository.Article().getBySlug(params.slug, params.lang === LanguageEnum.UZ ? LanguageEnum.RU : LanguageEnum.UZ);
     }
     if (!article) {
+      // Slug o'zgartirilgan bo'lsa — eski slug orqali topamiz, frontend javobdagi joriy slug'ga 301 redirect qiladi
+      article = await Repository.Article().getByOldSlug(params.slug);
+    }
+    if (!article) {
       throw new NotFoundError('Article');
     }
 

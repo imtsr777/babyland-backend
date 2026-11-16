@@ -1,5 +1,5 @@
 import * as Joi from 'joi';
-import { TranslatesSchema } from '../../core';
+import { ArticleContentTypeEnum, TranslatesSchema } from '../../core';
 
 export class UpdateArticleContentParams {
     paragraph: TranslatesSchema;
@@ -10,12 +10,16 @@ export class UpdateArticleContentParams {
 
     order: number;
 
+    /** Ixtiyoriy: berilsa blok turi shu turga o'zgartiriladi */
+    type?: ArticleContentTypeEnum;
+
     constructor(params: any) {
         if (params) {
             this.paragraph = params?.paragraph;
             this.text = params?.text;
             this.html = params?.html;
             this.order = params?.order;
+            this.type = params?.type;
         }
     }
 
@@ -38,4 +42,5 @@ export const UpdateArticleContentParamsSchema = Joi.object<UpdateArticleContentP
         ru: Joi.string().trim().required().max(500000),
     }),
     order: Joi.number().min(0).max(1000).required(),
+    type: Joi.string().valid(...Object.values(ArticleContentTypeEnum)),
 });
