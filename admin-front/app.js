@@ -368,19 +368,19 @@
             <label>Tavsif (RU)</label>
             <textarea name="description_ru" required>${v('description', 'ru')}</textarea>
           </div>
-          ${
-            isEdit
-              ? ''
-              : `<div>
-                  <label>Slug (UZ) <span class="hint">ixtiyoriy</span></label>
-                  <input name="slug_uz" type="text" minlength="5" maxlength="70" />
-                </div>
-                <div>
-                  <label>Slug (RU) <span class="hint">ixtiyoriy</span></label>
-                  <input name="slug_ru" type="text" minlength="5" maxlength="70" />
-                  <div class="hint">Bo'sh qoldirilsa sarlavhadan avtomatik yaratiladi</div>
-                </div>`
-          }
+          <div>
+            <label>Slug (UZ) ${isEdit ? '' : '<span class="hint">ixtiyoriy</span>'}</label>
+            <input name="slug_uz" type="text" minlength="5" maxlength="70" ${isEdit ? 'required' : ''} value="${v('slug', 'uz')}" />
+          </div>
+          <div>
+            <label>Slug (RU) ${isEdit ? '' : '<span class="hint">ixtiyoriy</span>'}</label>
+            <input name="slug_ru" type="text" minlength="5" maxlength="70" ${isEdit ? 'required' : ''} value="${v('slug', 'ru')}" />
+            <div class="hint">${
+              isEdit
+                ? "O'zgartirilsa eski havola yangisiga avtomatik yo'naltiriladi (301)"
+                : "Bo'sh qoldirilsa sarlavhadan avtomatik yaratiladi"
+            }</div>
+          </div>
         </div>
         <label>Rasm ${isEdit ? '<span class="hint">(o\'zgartirish uchun yangisini tanlang)</span>' : ''}</label>
         <input name="file" type="file" accept="${IMAGE_ACCEPT}" ${isEdit ? '' : 'required'} />
@@ -407,13 +407,11 @@
       const fd = new FormData();
       appendTranslates(fd, 'title', form.title_uz.value.trim(), form.title_ru.value.trim());
       appendTranslates(fd, 'description', form.description_uz.value.trim(), form.description_ru.value.trim());
-      if (!isEdit) {
-        const su = form.slug_uz.value.trim();
-        const sr = form.slug_ru.value.trim();
-        if (su || sr) {
-          if (!su || !sr) return toast("Slug ikkala til uchun ham to'ldirilishi kerak", 'error');
-          appendTranslates(fd, 'slug', su, sr);
-        }
+      const su = form.slug_uz.value.trim();
+      const sr = form.slug_ru.value.trim();
+      if (su || sr || isEdit) {
+        if (!su || !sr) return toast("Slug ikkala til uchun ham to'ldirilishi kerak", 'error');
+        appendTranslates(fd, 'slug', su, sr);
       }
       if (form.file.files[0]) fd.append('file', form.file.files[0]);
 
@@ -611,27 +609,26 @@
     };
   }
 
-  /** Replace a content block card with an inline edit form (PUT /article-content/:id). */
+  /** Replace a content block card with an inline edit form (PUT /article-content/:id). Type can be changed too. */
   function openBlockEditor(container, block) {
-    const isImage = block.type === 'IMAGE';
-    const value = block[VALUE_FIELD[block.type]];
+    const typeOptions = Object.entries(CONTENT_TYPES)
+      .map(([k, label]) => `<option value="${k}" ${k === block.type ? 'selected' : ''}>${esc(label)}</option>`)
+      .join('');
 
     container.outerHTML = `
       <form class="content-block" id="edit-block-form" style="flex-direction:column;gap:0;border-color:var(--primary)">
-        <div><span class="badge badge-type">${esc(block.type)}</span></div>
         <div class="grid-2">
+          <div>
+            <label>Turi</label>
+            <select name="type">${typeOptions}</select>
+          </div>
           <div>
             <label>Tartib raqami (order)</label>
             <input name="order" type="number" min="0" max="1000" required value="${esc(block.order)}" />
           </div>
         </div>
-        ${
-          isImage
-            ? `<label>Rasm <span class="hint">(o'zgartirish uchun yangisini tanlang)</span></label>
-               <input name="file" type="file" accept="${IMAGE_ACCEPT}" />
-               <img id="edit-preview" class="image-preview" ${block.imagePath ? `src="${esc(block.imagePath)}"` : 'hidden'} alt="" />`
-            : translatesInputs(block.type, value)
-        }
+        <div id="edit-type-hint"></div>
+        <div id="edit-fields"></div>
         <div class="form-actions">
           <button class="btn btn-primary" type="submit">Saqlash</button>
           <button class="btn" type="button" id="edit-cancel">Bekor qilish</button>
@@ -639,28 +636,70 @@
       </form>`;
 
     const form = document.getElementById('edit-block-form');
+    const fields = document.getElementById('edit-fields');
+    const typeHint = document.getElementById('edit-type-hint');
     form.scrollIntoView({ behavior: 'smooth', block: 'center' });
     document.getElementById('edit-cancel').onclick = () => render();
 
-    if (isImage) {
-      const preview = document.getElementById('edit-preview');
-      form.file.onchange = () => {
-        const f = form.file.files[0];
-        if (f) {
-          preview.src = URL.createObjectURL(f);
-          preview.hidden = false;
-        }
-      };
-    }
+    // Text typed so far, carried over when switching between TEXT / PARAGRAPH / HTML
+    let draft = block.type === 'IMAGE' ? null : block[VALUE_FIELD[block.type]];
+
+    const renderFields = () => {
+      const type = form.type.value;
+      const wasImage = block.type === 'IMAGE';
+      const needsNewImage = type === 'IMAGE' && !(wasImage && block.imagePath);
+
+      if (type === block.type) {
+        typeHint.innerHTML = '';
+      } else if (wasImage) {
+        typeHint.innerHTML = '<div class="hint">Saqlangandan so\'ng eski rasm serverdan o\'chiriladi.</div>';
+      } else if (type === 'IMAGE') {
+        typeHint.innerHTML = '<div class="hint">Rasmga o\'tkazilganda matn o\'chiriladi, yangi rasm yuklash majburiy.</div>';
+      } else {
+        typeHint.innerHTML = '<div class="hint">Matn yangi turga ko\'chiriladi.</div>';
+      }
+
+      if (type === 'IMAGE') {
+        fields.innerHTML = `
+          <label>Rasm ${needsNewImage ? '' : '<span class="hint">(o\'zgartirish uchun yangisini tanlang)</span>'}</label>
+          <input name="file" type="file" accept="${IMAGE_ACCEPT}" ${needsNewImage ? 'required' : ''} />
+          <img id="edit-preview" class="image-preview" ${wasImage && block.imagePath ? `src="${esc(block.imagePath)}"` : 'hidden'} alt="" />`;
+        const preview = document.getElementById('edit-preview');
+        form.file.onchange = () => {
+          const f = form.file.files[0];
+          if (f) {
+            preview.src = URL.createObjectURL(f);
+            preview.hidden = false;
+          }
+        };
+      } else {
+        fields.innerHTML = translatesInputs(type, draft);
+      }
+    };
+
+    let prevType = form.type.value;
+    form.type.onchange = () => {
+      if (prevType !== 'IMAGE' && form.val_uz) {
+        draft = { uz: form.val_uz.value, ru: form.val_ru.value };
+      }
+      prevType = form.type.value;
+      renderFields();
+    };
+    renderFields();
 
     form.onsubmit = async (e) => {
       e.preventDefault();
+      const type = form.type.value;
+      if (type !== block.type && block.type === 'IMAGE' && !confirm("Blok turi o'zgaradi va rasm o'chiriladi. Davom etasizmi?")) return;
+      if (type !== block.type && type === 'IMAGE' && !confirm("Blok rasmga aylanadi va matn o'chiriladi. Davom etasizmi?")) return;
+
       const fd = new FormData();
       fd.append('order', form.order.value);
-      if (isImage) {
+      fd.append('type', type);
+      if (type === 'IMAGE') {
         if (form.file.files[0]) fd.append('file', form.file.files[0]);
       } else {
-        appendTranslates(fd, VALUE_FIELD[block.type], form.val_uz.value.trim(), form.val_ru.value.trim());
+        appendTranslates(fd, VALUE_FIELD[type], form.val_uz.value.trim(), form.val_ru.value.trim());
       }
 
       const btn = form.querySelector('button[type=submit]');

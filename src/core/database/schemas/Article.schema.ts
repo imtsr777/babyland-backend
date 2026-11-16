@@ -21,6 +21,10 @@ export class ArticleSchema {
   @prop({ _id: false })
   slug: TranslatesSchema;
 
+  /** Avvalgi slug'lar (301 redirect uchun) */
+  @prop({ type: () => [String], default: [] })
+  oldSlugs?: string[];
+
   @prop()
   image: string;
 
